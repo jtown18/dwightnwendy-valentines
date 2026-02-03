@@ -25,10 +25,17 @@ export default function TimeMachine({
 }) {
   // Bounded index that stops at first/last image
   const [currentIndex, setCurrentIndex] = React.useState(0);
+  const [hasAnimated, setHasAnimated] = React.useState(false);
   const containerRef = React.useRef<HTMLDivElement>(null);
   const scrollAccumulator = React.useRef(0);
   const lastUpdateTime = React.useRef(Date.now());
   const touchStartY = React.useRef(0);
+
+  // Trigger initial animation
+  React.useEffect(() => {
+    const timer = setTimeout(() => setHasAnimated(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Calculate boundaries
   const minIndex = 0;
@@ -205,21 +212,37 @@ export default function TimeMachine({
             <motion.div
               key={card.index}
               className="absolute w-[98%] md:w-[95%] max-w-[1200px] aspect-[16/9] rounded-lg overflow-hidden shadow-2xl"
-              initial={false}
+              initial={
+                !hasAnimated
+                  ? {
+                      opacity: 0,
+                      scale: 0.8,
+                      y: 50,
+                    }
+                  : false
+              }
               animate={{
                 y,
                 scale,
-                transition: {
-                  type: "spring",
-                  stiffness: 250,
-                  damping: 20,
-                  mass: 0.5,
-                },
+                opacity: hasAnimated ? opacity : 1,
+                transition: hasAnimated
+                  ? {
+                      type: "spring",
+                      stiffness: 250,
+                      damping: 20,
+                      mass: 0.5,
+                    }
+                  : {
+                      type: "spring",
+                      stiffness: 200,
+                      damping: 25,
+                      delay: offsetIndex * 0.1,
+                    },
               }}
               style={{
                 willChange: "opacity, filter, transform",
                 filter: `blur(${blur}px)`,
-                opacity,
+                opacity: !hasAnimated ? undefined : opacity,
                 transitionProperty: "opacity, filter",
                 transitionDuration: "200ms",
                 transitionTimingFunction: "ease-in-out",
