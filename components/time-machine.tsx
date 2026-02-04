@@ -184,7 +184,7 @@ export default function TimeMachine({
     >
       <p
         className="absolute z-[2000] text-sm font-medium uppercase tracking-widest text-muted-foreground italic"
-        style={{ top: "120px" }}
+        style={{ top: "40px" }}
       >
         do you remember?~
       </p>
